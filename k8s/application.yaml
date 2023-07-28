@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deno-hello
+  labels:
+    app: deno-hello
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: deno-hello
+  template:
+    metadata:
+      labels:
+        app: deno-hello
+    spec:
+      containers:
+        - name: deno-hello
+          image: irbull/deno-hello:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: deno-hello-service
+spec:
+  type: NodePort
+  selector:
+    app: deno-hello
+  ports:
+    - name: deno-hello-port
+      protocol: TCP
+      port: 8000
+      targetPort: 8000
